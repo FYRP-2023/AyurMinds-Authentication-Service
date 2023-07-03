@@ -28,6 +28,9 @@ app.get("/", (req, res) => {
   res.send("Ayur Minds Authentication Service");
 });
 
+const userRoutes = require("./routes/userRoutes");
+app.use("/api/user", userRoutes);
+
 // HTTP request logger
 app.listen(PORT, () => {
   logger.info(`Server is starting at ${PORT}`);
