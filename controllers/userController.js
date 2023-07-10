@@ -57,6 +57,91 @@ const userController = {
       res.status(500).json({ msg: error.message });
     }
   },
+  signing: async (req, res) => {
+    try {
+      // get cred
+      const { email, password } = req.body;
+
+      // check email
+      const user = await mongoRepository.user.findOne({ email:email });
+      if (!user)
+        return res
+          .status(400)
+          .json({ msg: "This email is not registered in our system." });
+
+      // check password
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch)
+        return res.status(400).json({ msg: "This password is incorrect." });
+
+      // refresh token
+      const rf_token = createToken.refresh({ id: user._id });
+      res.cookie("_apprftoken", rf_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        maxAge: 24 * 60 * 60 * 1000, // 24h
+      });
+      // signing success
+      res.status(200).json({ msg: "Signing success" });
+    } catch (err) {
+      res.status(500).json({ msg: err.message });
+    }
+  },
+  access: async (req, res) => {
+    try {
+      // rf token
+      const rf_token = req.cookies._apprftoken;
+      if (!rf_token) return res.status(400).json({ msg: "Please sign in." });
+
+      // validate
+      jwt.verify(rf_token, process.env.REFRESH_TOKEN, (err, user) => {
+        if (err) return res.status(400).json({ msg: "Please sign in again." });
+        // create access token
+        const ac_token = createToken.access({ id: user.id });
+        // access success
+        return res.status(200).json({ ac_token });
+      });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  info: async (req, res) => {
+    try {
+      // get info -password
+      const user = await mongoRepository.user.findByIdWithoutPassword(req.user.id);
+      // return user
+      res.status(200).json(user);
+    } catch (err) {
+      res.status(500).json({ msg: err.message });
+    }
+  },
+  update: async (req, res) => {
+    try {
+      // // get info
+      // const { name, avatar } = req.body;
+
+      // // update
+      // await User.findOneAndUpdate({ _id: req.user.id }, { name, avatar });
+      // success
+      res.status(200).json({ msg: "Update success." });
+    } catch (err) {
+      res.status(500).json({ msg: err.message });
+    }
+  },
+  signout: async (req, res) => {
+    try {
+      // clear cookie
+      res.clearCookie("_apprftoken");
+      //change the access token
+      createToken.access({ id: "abc0" });
+      createToken.refresh({ id: "abc0" });
+      // success
+      return res.status(200).json({ msg: "Signout success." });
+    } catch (err) {
+      res.status(500).json({ msg: err.message });
+    }
+  },
 };
 
 module.exports = userController;
