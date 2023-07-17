@@ -21,14 +21,22 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "doctor", "admin"],
+      enum: ["user", "doctor", "pharmacist", "admin", "super_admin"],
       default: "user",
       required: true,
     },
     avatar: {
       type: String,
-      default: "",
+      default:
+        "https://res.cloudinary.com/dzhhvabny/image/upload/v1689611678/default_avatar/default-avatar.jpg",
     },
+    contactNo: {
+      type: String,
+    },
+    languageId:{
+      type:String,
+      default:1
+    }
   },
   { timestamps: true }
 );

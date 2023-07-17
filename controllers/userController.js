@@ -40,11 +40,16 @@ const userController = {
       const hashPassword = await bcrypt.hash(password, salt);
 
       const newUser = new User({
+        firstName,
+        lastName,
         email,
         password: hashPassword,
         role,
       });
+
       await mongoRepository.user.add(newUser);
+
+
       // Log an event
       logger.info("Event occurred: User added" + " " + email);
       // registration success
@@ -63,7 +68,7 @@ const userController = {
       const { email, password } = req.body;
 
       // check email
-      const user = await mongoRepository.user.findOne({ email:email });
+      const user = await mongoRepository.user.findOne({ email: email });
       if (!user)
         return res
           .status(400)
@@ -76,10 +81,11 @@ const userController = {
 
       // refresh token
       const rf_token = createToken.refresh({ id: user._id });
+      const cookieSameSite = process.env.NODE_ENV === "production" ? "none" : "strict";
       res.cookie("_apprftoken", rf_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        sameSite: cookieSameSite,
         maxAge: 24 * 60 * 60 * 1000, // 24h
       });
       // signing success
@@ -106,29 +112,6 @@ const userController = {
       return res.status(500).json({ msg: err.message });
     }
   },
-  info: async (req, res) => {
-    try {
-      // get info -password
-      const user = await mongoRepository.user.findByIdWithoutPassword(req.user.id);
-      // return user
-      res.status(200).json(user);
-    } catch (err) {
-      res.status(500).json({ msg: err.message });
-    }
-  },
-  update: async (req, res) => {
-    try {
-      // // get info
-      // const { name, avatar } = req.body;
-
-      // // update
-      // await User.findOneAndUpdate({ _id: req.user.id }, { name, avatar });
-      // success
-      res.status(200).json({ msg: "Update success." });
-    } catch (err) {
-      res.status(500).json({ msg: err.message });
-    }
-  },
   signout: async (req, res) => {
     try {
       // clear cookie
@@ -141,6 +124,10 @@ const userController = {
     } catch (err) {
       res.status(500).json({ msg: err.message });
     }
+  },
+  checkUser: async (req, res) => {
+    console.log("🚀 ~ file: userController.js:123 ~ checkUser: ~ req.params:", req.query)
+    return res.status(200).json({ msg: req.query.id });
   },
 };
 

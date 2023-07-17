@@ -2,18 +2,10 @@ const mongoose = require("mongoose");
 
 const doctorSchema = new mongoose.Schema(
   {
-    firstName: {
-      type: String,
-      required: true,
+    user:{
+      
     },
-    lastName: {
-      type: String,
-      required: true,
-    },
-    contactNo: {
-      type: String,
-      required: true,
-    },
+    isVerified: { type: Number, default: 0, enum: [0,1,2] }, //0:not verified 1: pending , 2:verified
   },
   { timestamps: true }
 );
