@@ -125,10 +125,6 @@ const userController = {
       res.status(500).json({ msg: err.message });
     }
   },
-  checkUser: async (req, res) => {
-    console.log("🚀 ~ file: userController.js:123 ~ checkUser: ~ req.params:", req.query)
-    return res.status(200).json({ msg: req.query.id });
-  },
 };
 
 module.exports = userController;
