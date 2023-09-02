@@ -45,6 +45,8 @@ const userController = {
         email,
         password: hashPassword,
         role,
+        isDoctor: role == "doctor" ? true : false,
+        isPharmacist: role == "pharmacist" ? true : false,
       });
 
       await mongoRepository.user.add(newUser);
