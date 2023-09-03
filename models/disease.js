@@ -6,7 +6,7 @@ const diseaseSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
-    otherNames: [
+    other_names: [
       {
         type: String,
       },
@@ -30,4 +30,5 @@ const diseaseSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Book = mongoose.model("Disease", diseaseSchema);
+const Disease = mongoose.model("Disease", diseaseSchema);
+module.exports = Disease;
