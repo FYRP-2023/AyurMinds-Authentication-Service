@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    gender: {
+      type: String,
+    },
     password: {
       type: String,
       required: true,
@@ -77,13 +80,21 @@ const userSchema = new mongoose.Schema(
           },
           comment: String,
           sentiment: Object,
+          diseases: [
+            {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: "Disease",
+            },
+          ],
         },
       ],
       availablePlaces: [
         {
-          cordinate: String,
+          name: String,
+          cordinate: Object,
           timeSlots: [
             {
+              daysType: String,
               from: String,
               to: String,
               isAvailable: Boolean,

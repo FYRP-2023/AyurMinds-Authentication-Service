@@ -9,7 +9,7 @@ const { default: isEmail } = require("validator/lib/isemail");
 const userController = {
   register: async (req, res) => {
     try {
-      const { firstName, lastName, email, password, role } = req.body;
+      const { firstName, lastName, email, password, role,gender } = req.body;
 
       // check fields
       if (!email || !password || !role || !firstName || !lastName)
@@ -47,6 +47,7 @@ const userController = {
         role,
         isDoctor: role == "doctor" ? true : false,
         isPharmacist: role == "pharmacist" ? true : false,
+        gender,
       });
 
       await mongoRepository.user.add(newUser);
